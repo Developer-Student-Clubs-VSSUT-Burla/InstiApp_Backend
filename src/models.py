@@ -48,7 +48,7 @@ class project(models.Model):
     name=models.CharField(max_length=200,null=True,blank=True)
     description=models.CharField(max_length=200,null=True,blank=True)
     contributor=models.ForeignKey(User,on_delete=models.SET_DEFAULT,default="Anonymous",null=False)
-    team_members=models.ManyToManyField(team_member)
+    team_members=models.ManyToManyField(User,related_name='team')
     tags= models.CharField(max_length=200,null=True,blank=True)
 
     def __str__(self):
