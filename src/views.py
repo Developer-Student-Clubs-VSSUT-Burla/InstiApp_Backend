@@ -71,26 +71,29 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         data = request.data
-
+        user = request.user
+        # pdb.set_trace()
         NewProjectObj = project.objects.create(name=data['name'],
                                                description=data['description'],
-                                               tags=data['tags'])
+                                               tags=data['tags'],
+                                               contributor=user)
 
-        NewProjectObj.contributor = request.user
+        print(type(data['team_members']))
+        team_members_list=data['team_members'].split(',')
+        print(team_members_list)
+        for reg in team_members_list:
+            member = User.objects.get(regno=reg)
+            # print("reg=>",reg)
+            print(member)
+            NewProjectObj.team_members.add(member)
 
-        for reg in data['team_members']:
-            member = team_member.objects.get(regno=reg)
-            NewProjectObj.contributor.add(member)
-
+        # pdb.set_trace()
         NewProjectObj.save()
         serializer = ProjectSerializer(NewProjectObj)
         return Response(serializer.data)
 
     def get_queryset(self):
         return project.objects.all()
-
-
-# def UserViewSet(viewsets.ModelViewSet):
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -116,13 +119,19 @@ def registerUser(request):
     data = request.data
     print((data['name']))
     user = User.objects.create(name=data['name'],
-                                username=data['emailid'],
-                                branch=data['branch'],
-                                regno=data['regno'],
-                                about=data['about'],
-                                fa=data['fa'],
-                                password=make_password(data['password']))
+                               username=data['emailid'],
+                               branch=data['branch'],
+                               regno=data['regno'],
+                               about=data['about'],
+                               fa=data['fa'],
+                               password=make_password(data['password']))
 
     serializer = UserSerializerWithToken(user, many=False)
     return Response(serializer.data)
-    
+
+
+@api_view(['GET'])
+def getUsers(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
