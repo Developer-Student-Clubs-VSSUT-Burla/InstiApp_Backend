@@ -18,6 +18,8 @@ from django.urls import path,include
 from rest_framework.routers import DefaultRouter
 from django.views.generic import TemplateView
 from src import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name='src'
 
@@ -28,4 +30,7 @@ urlpatterns = [
     path("api/events/",include('src.urls.event_urls')),
     path("api/projects/",include('src.urls.project_urls')),
     path("api/users/",include('src.urls.user_urls')),
+    path("api/feeds/",include('src.urls.feed_urls')),
 ]
+
+urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

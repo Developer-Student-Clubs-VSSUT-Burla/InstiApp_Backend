@@ -58,3 +58,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class FeedSerializer(serializers.ModelSerializer):
+    team_members=UserSerializer(many=True)
+    contributor=UserSerializer(many=False)
+
+    class Meta:
+        model = feed
+        fields = '__all__'
