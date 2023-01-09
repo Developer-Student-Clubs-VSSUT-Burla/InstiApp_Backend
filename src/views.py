@@ -96,6 +96,53 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return project.objects.all()
 
 
+
+class FeedViewSet(viewsets.ModelViewSet):
+    serializer_class = FeedSerializer
+
+    # permission_classes=[UserPermission]
+
+    def list(self, request):
+        feeds = feed.objects.all()
+        serializer = FeedSerializer(feeds, many=True)
+        return Response(serializer.data)
+
+    # def retrieve(self, request, pk):
+    #     try:
+    #         project_obj = project.objects.get(_id=pk)
+    #     except project.DoesNotExist:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+    #     serializer = ProjectSerializer(project_obj)
+    #     return Response(serializer.data)
+
+    # def create(self, request):
+    #     data = request.data
+    #     user = request.user
+    #     # pdb.set_trace()
+    #     NewProjectObj = project.objects.create(name=data['name'],
+    #                                            description=data['description'],
+    #                                            tags=data['tags'],
+    #                                            contributor=user)
+
+    #     print(type(data['team_members']))
+    #     team_members_list=data['team_members'].split(',')
+    #     print(team_members_list)
+    #     for reg in team_members_list:
+    #         member = User.objects.get(regno=reg)
+    #         # print("reg=>",reg)
+    #         print(member)
+    #         NewProjectObj.team_members.add(member)
+
+    #     # pdb.set_trace()
+    #     NewProjectObj.save()
+    #     serializer = ProjectSerializer(NewProjectObj)
+    #     return Response(serializer.data)
+
+    def get_queryset(self):
+        return project.objects.all()
+
+
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
