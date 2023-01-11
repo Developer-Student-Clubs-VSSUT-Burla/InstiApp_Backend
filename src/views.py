@@ -103,7 +103,10 @@ class FeedViewSet(viewsets.ModelViewSet):
     # permission_classes=[UserPermission]
 
     def list(self, request):
-        feeds = feed.objects.all()
+        query=request.query_params.get('keyword')
+        if(query==None):
+            query=''
+        feeds = feed.objects.filter(title_icontains=query)
         serializer = FeedSerializer(feeds, many=True)
         return Response(serializer.data)
 

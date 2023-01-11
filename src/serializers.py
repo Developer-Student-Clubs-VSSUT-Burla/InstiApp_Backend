@@ -43,7 +43,7 @@ class UserSerializerWithToken(UserSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
 
-    contributor=UserSerializer(many=True)
+    # club_name=UserSerializer(many=True)
     class Meta:
         model = event
         fields = '__all__'
