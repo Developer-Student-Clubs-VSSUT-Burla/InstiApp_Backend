@@ -41,7 +41,9 @@ class EventViewset(viewsets.ModelViewSet):
             date=data['date'],
             venue=data['venue'],
             club_name=data['club_name'],
-        )
+            event_time=data['event_time'],
+            event_type=data['event_type'],
+            link=data['link'])
 
         newEvent.save()
         serializer = EventSerializer(newEvent)
@@ -76,10 +78,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         NewProjectObj = project.objects.create(name=data['name'],
                                                description=data['description'],
                                                tags=data['tags'],
-                                               contributor=user)
+                                               contributor=user,
+                                               link=data['link'])
 
         print(type(data['team_members']))
-        team_members_list=data['team_members'].split(',')
+        team_members_list = data['team_members'].split(',')
         print(team_members_list)
         for reg in team_members_list:
             member = User.objects.get(regno=reg)
@@ -96,54 +99,59 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return project.objects.all()
 
 
-
 class FeedViewSet(viewsets.ModelViewSet):
     serializer_class = FeedSerializer
 
     # permission_classes=[UserPermission]
 
     def list(self, request):
-        query=request.query_params.get('keyword')
-        if(query==None):
-            query=''
-        feeds = feed.objects.filter(title_icontains=query)
-        serializer = FeedSerializer(feeds, many=True)
+        query = request.query_params.get('keyword')
+
+        queryset = feed.objects.all()
+
+        if (query is not None):
+            queryset = queryset.filter(title__icontains=query)
+            print(queryset)
+        else:
+            print("QuerySet not none")
+        serializer = FeedSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    # def retrieve(self, request, pk):
-    #     try:
-    #         project_obj = project.objects.get(_id=pk)
-    #     except project.DoesNotExist:
-    #         return Response(status=status.HTTP_400_BAD_REQUEST)
-    #     serializer = ProjectSerializer(project_obj)
-    #     return Response(serializer.data)
+    def retrieve(self, request, pk):
+        try:
+            feed_obj = feed.objects.get(_id=pk)
+        except feed.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = FeedSerializer(feed_obj)
+        return Response(serializer.data)
 
-    # def create(self, request):
-    #     data = request.data
-    #     user = request.user
-    #     # pdb.set_trace()
-    #     NewProjectObj = project.objects.create(name=data['name'],
-    #                                            description=data['description'],
-    #                                            tags=data['tags'],
-    #                                            contributor=user)
+    def create(self, request):
+        data = request.data
+        user = request.user
+        # pdb.set_trace()
+        NewFeedObj = feed.objects.create(title=data['title'],
+                                         description=data['description'],
+                                         contributor=user,
+                                         category='category')
+        team_members_list = data['team_members'].split(',')
+        print(data)
+        # print(team_members_list)
+        for reg in team_members_list:
+            member = User.objects.get(regno=reg)
+            # print("reg=>",reg)
+            print(member)
+            NewFeedObj.team_members.add(member)
 
-    #     print(type(data['team_members']))
-    #     team_members_list=data['team_members'].split(',')
-    #     print(team_members_list)
-    #     for reg in team_members_list:
-    #         member = User.objects.get(regno=reg)
-    #         # print("reg=>",reg)
-    #         print(member)
-    #         NewProjectObj.team_members.add(member)
+        # `choice=data['choices']
+        # pdb.set_trace()
 
-    #     # pdb.set_trace()
-    #     NewProjectObj.save()
-    #     serializer = ProjectSerializer(NewProjectObj)
-    #     return Response(serializer.data)
+        # pdb.set_trace()
+        NewFeedObj.save()
+        serializer = FeedSerializer(NewFeedObj)
+        return Response(serializer.data)
 
     def get_queryset(self):
         return project.objects.all()
-
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):

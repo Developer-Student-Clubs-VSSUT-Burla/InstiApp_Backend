@@ -21,6 +21,10 @@ class User(AbstractUser):
 
 
 class event(models.Model):
+
+    event_choices = (("Virtual", "Virtual"), ("Hybrid", "Hybrid"),
+                     ('In-Person', 'In-Person'))
+
     _id = models.AutoField(primary_key=True, null=False, editable=False)
     name = models.CharField(max_length=200, null=True, blank=True)
     description = models.CharField(max_length=200, null=True, blank=True)
@@ -29,6 +33,12 @@ class event(models.Model):
     date = models.DateField(blank=True, null=True)
     venue = models.CharField(max_length=200, null=True, blank=True)
     club_name = models.CharField(max_length=200, null=True, blank=True)
+    event_time = models.DateField(blank=True, null=True)
+    event_type = models.CharField(max_length=200,
+                                  choices=event_choices,
+                                  null=True,
+                                  blank=True)
+    link = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return (self.name)
@@ -54,6 +64,8 @@ class project(models.Model):
                                     null=False)
     team_members = models.ManyToManyField(User, related_name='team')
     tags = models.CharField(max_length=200, null=True, blank=True)
+    link = models.CharField(max_length=200, null=True, blank=True)
+    post_date = models.DateField(auto_now=True)
 
     def __str__(self):
         return (self.name)
